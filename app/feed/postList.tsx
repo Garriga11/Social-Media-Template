@@ -1,22 +1,11 @@
+// filepath: c:\Users\garri\OneDrive\Desktop\New folder (28)\posts\app\feed\postList.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { PostCard } from "@/app/feed/postCard";
-import DeleteButton from "@/app/feed/deleteButton";
-import { fetchPosts } from "@/app/feed/action"; // Import fetchPosts from action
 
-type Post = {
-    id: string;
-    content: string;
-    createdAt: string; // already serialized
-    userId: string;
-    user: {
-        firstName?: string | null;
-        lastName?: string | null;
-        email: string;
-    };
-};
+import { fetchPosts, Post } from "@/app/feed/action"; // Import Post type and fetchPosts
 
 export function PostList() {
     const { user } = useUser();
@@ -24,12 +13,14 @@ export function PostList() {
 
     useEffect(() => {
         async function loadPosts() {
-            const data = await fetchPosts(); // Fetch posts from the server
+            const data: Post[] = await fetchPosts(); // Explicitly type the data
             console.log("Fetched posts in PostList:", data); // Debugging
-            setPosts(data.map(post => ({
-                ...post,
-                createdAt: post.createdAt.toISOString(), // Convert Date to string
-            }))); // Update the state with the fetched posts
+            setPosts(
+                data.map((post: Post) => ({
+                    ...post,
+                    createdAt: post.createdAt.toISOString(), // Convert Date to string
+                }))
+            ); // Update the state with the fetched posts
         }
 
         loadPosts();
@@ -40,18 +31,18 @@ export function PostList() {
             {posts.length > 0 ? (
                 posts.map((post) => (
                     <div key={post.id} className="relative">
-                        <PostCard 
-                            content={post.content} 
-                            createdAt={post.createdAt} 
+                        <PostCard
+                            content={post.content}
+                            createdAt={post.createdAt.toString()}
                             user={{
                                 ...post.user,
                                 firstName: post.user.firstName ?? undefined,
                                 lastName: post.user.lastName ?? undefined,
-                            }} 
+                            }}
                         />
                         {user?.id === post.userId && (
                             <div className="absolute top-2 right-2">
-                                <DeleteButton postId={post.id} />
+                             
                             </div>
                         )}
                     </div>

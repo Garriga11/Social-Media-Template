@@ -1,48 +1,27 @@
-"use server";
-
+// filepath: c:\Users\garri\OneDrive\Desktop\New folder (28)\posts\app\feed\action.ts
 import prisma from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
 
+export type Post = {
+    id: string;
+    content: string;
+    createdAt: Date;
+    userId: string;
+    user: {
+        firstName?: string | null;
+        lastName?: string | null;
+        email: string;
+    };
+};
 
-
-export async function fetchPosts() {
+export async function fetchPosts(): Promise<Post[]> {
     const posts = await prisma.posts.findMany({
         include: {
-            user: true, // Include user details
+            user: true,
         },
         orderBy: {
-            createdAt: "desc", // Order by newest first
+            createdAt: "desc",
         },
     });
 
     return posts;
-}
-
- 
-export async function deletePost(postId: string) {
-    const { userId } = await auth();
-
-    if (!userId) {
-        throw new Error("Unauthorized: User is not signed in.");
-    }
-
-
-    const post = await prisma.posts.findUnique({
-        where: { id: postId },
-    });
-
-    if (!post) {
-        throw new Error("Post not found.");
-    }
-
-    if (post.userId !== userId) {
-        throw new Error("Not allowed: You can only delete your own posts.");
-    }
-
-    // Delete the post
-    await prisma.posts.delete({
-        where: { id: postId },
-    });
-
-    return { message: "Post deleted successfully." };
 }
