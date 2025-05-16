@@ -18,7 +18,7 @@ export function PostList() {
             setPosts(
                 data.map((post: Post) => ({
                     ...post,
-                    createdAt: post.createdAt.toISOString(), // Convert Date to string
+                    createdAt: new Date(post.createdAt), // Ensure createdAt is a Date
                 }))
             ); // Update the state with the fetched posts
         }
