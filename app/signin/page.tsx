@@ -1,32 +1,30 @@
 "use client";
 
-import prisma from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { useState, startTransition } from "react";
+import { updateUserProfile } from "@/app/signin/action";
 
-export async function updateUserProfile(data: { firstName: string; lastName: string; image: string }) {
-    const { userId } = await auth();
-
-    if (!userId) {
-        throw new Error("Unauthorized: User is not signed in.");
-    }
-
-    const user = await prisma.user.findUnique({
-        where: { clerkId: userId },
+export function ProfileForm() {
+    const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        image: "",
     });
 
-    if (!user) {
-        throw new Error("User not found in the database.");
-    }
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-    const updatedUser = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.lastName,
-            imageUrl: data.image,
-        },
-    });
+        startTransition(() => {
+            updateUserProfile(formData).catch((err) => {
+                console.error("Update failed", err);
+            });
+        });
+    };
 
-    return updatedUser;
+    return (
+        <form onSubmit={handleSubmit}>
+            {/* Your inputs for firstName, lastName, email, image */}
+            <button type="submit">Save</button>
+        </form>
+    );
 }
