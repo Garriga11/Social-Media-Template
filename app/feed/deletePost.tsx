@@ -1,6 +1,6 @@
 "use client"
 
-import { deletePost as deletePostAPI } from "@/app/feed/deletePosts"; 
+import { deletePost as deletePostAPI } from "@/app/feed/action"; 
 function deletePost({ postId }: { postId: string }) {
     const handleDelete = async () => {
         try {

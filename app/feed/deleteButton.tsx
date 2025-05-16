@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { deletePost } from '@/app/feed/deletePost';
+import { deletePost } from '@/app/feed/action';
 
 type Props = {
 postId: string;
