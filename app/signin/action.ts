@@ -1,37 +1,27 @@
-"use server";
-
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
 
-export async function updateUserProfile(data: {
-    firstName: string;
-    lastName: string;
-    image: string;
-    email: string;
-}) {
+export async function createUserIfNotExists() {
     const { userId } = await auth();
 
-    if (!userId) {
-        throw new Error("Unauthorized: User is not signed in.");
-    }
+    if (!userId) return;
 
-    const user = await prisma.user.findUnique({
+    const existingUser = await prisma.user.findUnique({
         where: { clerkId: userId },
     });
 
-    if (!user) {
-        throw new Error("User not found in the database.");
+    if (!existingUser) {
+        const clerk = await clerkClient();
+        const clerkUser = await clerk.users.getUser(userId);
+
+        await prisma.user.create({
+            data: {
+                clerkId: clerkUser.id,
+                firstName: clerkUser.firstName || "",
+                lastName: clerkUser.lastName || "",
+                email: clerkUser.emailAddresses[0]?.emailAddress || "",
+                imageUrl: clerkUser.imageUrl,
+            },
+        });
     }
-
-    const updatedUser = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
-            imageUrl: data.image,
-        },
-    });
-
-    return updatedUser;
 }
