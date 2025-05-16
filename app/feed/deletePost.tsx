@@ -1,10 +1,10 @@
 "use client"
 
-import { deletePost } from "@/app/feed/action"; 
+import { deletePost as deletePostAPI } from "@/app/feed/deletePosts"; 
 function deletePost({ postId }: { postId: string }) {
     const handleDelete = async () => {
         try {
-            await deletePost(postId);
+            await deletePostAPI(postId);
             // optionally revalidate or show success
         } catch (err) {
             console.error(err);

@@ -12,8 +12,8 @@ type Post = {
     createdAt: string; // already serialized
     userId: string;
     user: {
-        firstName?: string;
-        lastName?: string;
+        firstName?: string | null;
+        lastName?: string | null;
         email: string;
     };
 };
@@ -26,7 +26,10 @@ export function PostList() {
         async function loadPosts() {
             const data = await fetchPosts(); // Fetch posts from the server
             console.log("Fetched posts in PostList:", data); // Debugging
-            setPosts(data); // Update the state with the fetched posts
+            setPosts(data.map(post => ({
+                ...post,
+                createdAt: post.createdAt.toISOString(), // Convert Date to string
+            }))); // Update the state with the fetched posts
         }
 
         loadPosts();
@@ -37,7 +40,15 @@ export function PostList() {
             {posts.length > 0 ? (
                 posts.map((post) => (
                     <div key={post.id} className="relative">
-                        <PostCard content={post.content} createdAt={post.createdAt} user={post.user} />
+                        <PostCard 
+                            content={post.content} 
+                            createdAt={post.createdAt} 
+                            user={{
+                                ...post.user,
+                                firstName: post.user.firstName ?? undefined,
+                                lastName: post.user.lastName ?? undefined,
+                            }} 
+                        />
                         {user?.id === post.userId && (
                             <div className="absolute top-2 right-2">
                                 <DeleteButton postId={post.id} />
