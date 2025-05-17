@@ -1,4 +1,3 @@
-// filepath: c:\Users\garri\OneDrive\Desktop\New folder (28)\posts\app\feed\action.ts
 import prisma from "@/lib/prisma";
 
 export type Post = {
@@ -16,7 +15,13 @@ export type Post = {
 export async function fetchPosts(): Promise<Post[]> {
     const posts = await prisma.posts.findMany({
         include: {
-            user: true,
+            user: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                },
+            },
         },
         orderBy: {
             createdAt: "desc",
@@ -24,4 +29,7 @@ export async function fetchPosts(): Promise<Post[]> {
     });
 
     return posts;
+
+console.log('posts fetched', posts); 
+
 }

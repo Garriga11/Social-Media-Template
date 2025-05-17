@@ -40,7 +40,7 @@ export default async function Home() {
         Create A Post
       </Link>
       <Link
-        href="/profile"
+        href="/user"
         className="mt-4 text-white bg-purple-500 hover:bg-purple-600 shadow-md hover:shadow-lg transition-shadow p-3 rounded-lg"
       >
         Update Profile

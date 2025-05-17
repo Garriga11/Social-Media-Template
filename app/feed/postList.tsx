@@ -10,21 +10,20 @@ import { fetchPosts, Post } from "@/app/feed/action"; // Import Post type and fe
 export function PostList() {
     const { user } = useUser();
     const [posts, setPosts] = useState<Post[]>([]);
-
     useEffect(() => {
         async function loadPosts() {
-            const data: Post[] = await fetchPosts(); // Explicitly type the data
-            console.log("Fetched posts in PostList:", data); // Debugging
-            setPosts(
-                data.map((post: Post) => ({
-                    ...post,
-                    createdAt: new Date(post.createdAt), // Ensure createdAt is a Date
-                }))
-            ); // Update the state with the fetched posts
+            try {
+                const res = await fetch('/api/posts');
+                const data = await res.json();
+                setPosts(data);
+            } catch (err) {
+                console.error('Failed to load posts:', err);
+            }
         }
 
         loadPosts();
     }, []);
+
 
     return (
         <div className="space-y-4">
