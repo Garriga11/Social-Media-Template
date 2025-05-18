@@ -1,4 +1,4 @@
-import { type Metadata } from 'next'
+// app/layout.tsx
 import {
   ClerkProvider,
   SignInButton,
@@ -12,14 +12,8 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { Suspense } from 'react'
 import { Sidebar } from '@/components/sidebar'
-import { Viewport } from 'next'
 
-
-const inter = Inter({
-  subsets: ['latin'],
-})
-
-
+const inter = Inter({ subsets: ['latin'] })
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,51 +25,52 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'Social Media template',
-  viewport: 'width=device-width, initial-scale=1',
   authors: [{ name: 'G19 Programs' }],
- 
   icons: {
     icon: '/favicon.ico',
-    shortcut: '/favicon.ico'
+    shortcut: '/favicon.ico',
   },
-  description: 'A social media template built with Next.js, Prisma, Clerk & powered by Vercel.',
+  description:
+    'A social media template built with Next.js, Prisma, Clerk & powered by Vercel.',
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-  <div className="flex min-h-screen">
-    <Sidebar />
-    <div className="flex-1 flex flex-col">
-      <ClerkProvider>
-        <html lang="en">
-          <body className={inter.className}>
-            <Suspense fallback={<GlobalSkeleton />}>
-            
-            <header className="flex justify-end items-center p-4 gap-4 h-16">
-              <SignedOut>
-                <SignInButton />
-                <SignUpButton />
-              </SignedOut>
-              <SignedIn>
-                <UserButton />
-              </SignedIn>
-            </header>
-            
-            {children}
-            </Suspense>
-          </body>
-        </html>
-      </ClerkProvider>
-    </div>
-  </div>
+    <ClerkProvider>
+      <html lang="en">
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </head>
+        <body className={`${inter.className} ${geistSans.variable} ${geistMono.variable}`}>
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <div className="flex-1 flex flex-col">
+              <Suspense fallback={<GlobalSkeleton />}>
+                <header className="flex justify-end items-center p-4 gap-4 h-16">
+                  <SignedOut>
+                    <SignInButton />
+                    <SignUpButton />
+                  </SignedOut>
+                  <SignedIn>
+                    <UserButton />
+                  </SignedIn>
+                </header>
+                {children}
+              </Suspense>
+            </div>
+          </div>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
+
 function GlobalSkeleton() {
   return <div className="p-6 text-muted">Loading app...</div>
 }

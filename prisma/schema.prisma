@@ -8,47 +8,28 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  clerkId   String    @unique
-  email     String
-  imageUrl  String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  firstName String?
-  lastName  String?
-  posts     Posts[]   @relation("UserPosts")
-  comments  Comment[] @relation("UserComments")
-  likes     Like[]    @relation("UserLikes")
-}
-
-model Posts {
-  id        String    @id @default(cuid())
-  content   String
-  createdAt DateTime  @default(now())
-  userId    String
-  user      User      @relation("UserPosts", fields: [userId], references: [id])
-  comments  Comment[] @relation("PostComments")
-  likes     Like[]    @relation("PostLikes")
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  name     String?
+  comments Comment[] @relation("UserComments")
+  Post     Post[]
 }
 
 model Comment {
-  id        String   @id @default(cuid())
-  content   String
-  createdAt DateTime @default(now())
-  postId    String
-  userId    String
-
-  posts Posts @relation("PostComments", fields: [postId], references: [id])
-  user  User  @relation("UserComments", fields: [userId], references: [id])
+  id      Int    @id @default(autoincrement())
+  content String
+  userId  Int
+  postId  Int
+  posts   Post   @relation("PostComments", fields: [postId], references: [id])
+  user    User   @relation("UserComments", fields: [userId], references: [id])
 }
 
-model Like {
-  id     String @id @default(cuid())
-  userId String
-  postId String
-
-  posts Posts @relation("PostLikes", fields: [postId], references: [id])
-  user  User  @relation("UserLikes", fields: [userId], references: [id])
-
-  @@unique([userId, postId]) // Ensure one like per user per post
+model Post {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  userId    Int
+  createdAt DateTime  @default(now())
+  comments  Comment[] @relation("PostComments")
+  User      User      @relation(fields: [userId], references: [id])
 }
