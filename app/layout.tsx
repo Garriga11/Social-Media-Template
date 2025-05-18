@@ -12,7 +12,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { Suspense } from 'react'
 import { Sidebar } from '@/components/sidebar'
-
+import { Viewport } from 'next'
 
 
 const inter = Inter({
@@ -33,6 +33,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Social Media template',
+  viewport: 'width=device-width, initial-scale=1',
+  authors: [{ name: 'G19 Programs' }],
  
   icons: {
     icon: '/favicon.ico',
