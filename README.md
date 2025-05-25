@@ -1,4 +1,4 @@
-# Full-Stack App with Clerk, Prisma, & Next.js
+# Full-Stack App with Clerk, Prisma,  & Next.js
 
 This is a production-ready full-stack web application built with:
 
