@@ -1,11 +1,11 @@
 'use server'
 
-import { useAuth } from '@clerk/nextjs'
+import { auth } from '@clerk/nextjs'
 import prisma from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
 export async function deletePost(postId: number) {
-    const { userId } = useAuth()
+    const { userId } = auth()
     if (!userId) throw new Error('Not authenticated')
 
     const post = await prisma.post.findUnique({ where: { id: postId } })
