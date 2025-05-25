@@ -2,7 +2,7 @@
 
 This is a production-ready full-stack web application built with:
 
-- **Next.js App Router (v14/15)**
+- **Next.js App Router**
 - **Clerk** for authentication and user management
 
 - **Prisma** as the ORM with PostgreSQL
