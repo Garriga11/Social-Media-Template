@@ -27,8 +27,8 @@ This is a production-ready full-stack web application built with:
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/yourusername/your-repo.git
-cd your-repo
+git clone https://github.com/garriga11/Social-Media-Template
+cd Social-Media-Template
 
 npm install
 
