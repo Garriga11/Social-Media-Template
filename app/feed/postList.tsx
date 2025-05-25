@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { PostCard } from "@/app/feed/postCard";
+import { DeletePostButton } from "@/app/delete/deleteButton";
 
 export interface Post {
     id: number;
@@ -65,6 +66,14 @@ export function PostList() {
                                 {/* Add any user-specific actions here */}
                             </div>
                         )}
+
+                        {posts.map(post => (
+                            <div key={post.id} className="border p-4">
+                                <p>{post.content}</p>
+                                <DeletePostButton postId={post.id} postClerkId={post.author.clerkId} />
+                            </div>
+                        ))}
+
                     </div>
                 ))
             ) : (
