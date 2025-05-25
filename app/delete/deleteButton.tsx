@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { useUser } from '@clerk/nextjs'
-import { useTransition } from 'react'
-import { deletePost } from '@/app/delete/action'
+import { useUser } from '@clerk/nextjs';
+import { useTransition } from 'react';
+import { deletePost } from '@/app/delete/action';
 
 type Props = {
   postId: number
