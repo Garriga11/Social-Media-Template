@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { PostCard } from "@/app/feed/postCard";
 import { DeletePostButton } from "@/app/delete/deleteButton";
+import { EditPostForm } from "@/app/editPosts/editPostForm";
 
 export interface Post {
     id: number;
@@ -73,6 +74,24 @@ export function PostList() {
                                 <DeletePostButton postId={post.id} postClerkId={post.author.clerkId} />
                             </div>
                         ))}
+                        {posts.map(post => (
+                            <div key={post.id} className="border p-4">
+                                <p>{post.content}</p>
+                                <EditPostForm
+                                    postId={post.id}
+                                    postClerkId={post.author.clerkId}
+                                    initialContent={post.content ?? ''}
+                                />
+                            </div>
+                        ))}
+
+                        {user?.id === post.author.clerkId && (
+                            <div className="flex gap-4">
+                                <EditPostForm postId={post.id} postClerkId={post.author.clerkId} initialContent={post.content ?? ''} />
+                                <DeletePostButton postId={post.id} postClerkId={post.author.clerkId} />
+                            </div>
+                        )}
+
 
                     </div>
                 ))
