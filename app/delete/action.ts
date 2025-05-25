@@ -5,15 +5,21 @@ import prisma from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
 export async function deletePost(postId: number) {
-  const { userId } = await auth() 
+  const { userId } = await auth()
 
-  if (!userId) throw new Error('Not authenticated')
+  if (!userId) {
+    throw new Error('Not authenticated')
+  }
 
   const post = await prisma.post.findUnique({
     where: { id: postId }
   })
 
-  if (!post || post.clerkId !== userId) {
+  if (!post) {
+    throw new Error('Post not found')
+  }
+
+  if (post.clerkId !== userId) {
     throw new Error('Not authorized')
   }
 
