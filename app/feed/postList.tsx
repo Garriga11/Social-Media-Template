@@ -1,4 +1,4 @@
-import { DeletePostButton } from '@/app/delete/DeletePostButton'
+import { DeletePostButton } from '@/app/delete/deleteButton';
 
 type Post = {
   id: number
