@@ -1,18 +1,25 @@
 'use server'
 
-import { auth } from '@clerk/nextjs/server';
-
-import prisma from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
+import { auth } from '@clerk/nextjs/server'
+import prisma from '@/lib/prisma'
+import { revalidatePath } from 'next/cache'
 
 export async function deletePost(postId: number) {
-    const { userId } = auth()
-    if (!userId) throw new Error('Not authenticated')
+  const { userId } = await auth() 
 
-    const post = await prisma.post.findUnique({ where: { id: postId } })
-    if (!post || post.clerkId !== userId) throw new Error('Not authorized')
+  if (!userId) throw new Error('Not authenticated')
 
-    await prisma.post.delete({ where: { id: postId } })
-    revalidatePath('/feed') // or your page route
+  const post = await prisma.post.findUnique({
+    where: { id: postId }
+  })
+
+  if (!post || post.clerkId !== userId) {
+    throw new Error('Not authorized')
+  }
+
+  await prisma.post.delete({
+    where: { id: postId }
+  })
+
+  revalidatePath('/feed')
 }
-
