@@ -1,8 +1,8 @@
-'use server'
+'use server';
 
-import { auth } from '@clerk/nextjs/server'
-import prisma from '@/lib/prisma'
-import { revalidatePath } from 'next/cache'
+import { auth } from '@clerk/nextjs/server';
+import prisma from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 
 export async function deletePost(postId: number) {
   const { userId } = await auth()
