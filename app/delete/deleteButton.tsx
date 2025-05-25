@@ -1,5 +1,3 @@
-'use client'
-
 import { useUser } from '@clerk/nextjs'
 import { useTransition } from 'react'
 import { deletePost } from '@/app/delete/action';
@@ -16,18 +14,24 @@ export function DeletePostButton({ postId, postClerkId }: Props) {
     if (user?.id !== postClerkId) return null
 
     const handleDelete = () => {
+        if (!confirm('Are you sure you want to delete this post?')) return
+
         startTransition(() => {
-            deletePost(postId)
+            deletePost(postId).catch(err => {
+                console.error('Failed to delete post:', err)
+                alert('Something went wrong while deleting the post.')
+            })
         })
+
     }
 
     return (
         <button
             onClick={handleDelete}
             disabled={isPending}
-            className="text-sm text-red-600"
-        >
-            {isPending ? 'Deleting...' : 'Delete'}
-        </button>
-    )
+            className='px - 3 py-1 rounded text-sm font-medium transition isPending bg-gray-300 text-gray-600 cursor-not-allowed  bg-red-600 text-white hover:bg-red-700'
+>
+console.log({ isPending? 'Deleting...': 'Delete' });
+</button >
+)
 }
