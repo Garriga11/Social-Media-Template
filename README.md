@@ -15,11 +15,9 @@ This is a production-ready full-stack web application built with:
 ## Features
 
 - [x] Role-based authentication with Clerk (admin/member)
-- [x] Stripe payments with custom forms and PDF receipts
 - [x] Webhook handling (Clerk user sync via Svix)
 - [x] Server actions and Prisma integration
-- [x] Deployed on Vercel with environment-based config
-- [x] Dashboard with totals and status cards
+- [x] Deployed on Vercel 
 - [x] Clean folder structure for scalability
 
 ---
