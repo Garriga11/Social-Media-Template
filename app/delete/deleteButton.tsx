@@ -2,7 +2,7 @@
 
 import { useUser } from '@clerk/nextjs'
 import { useTransition } from 'react'
-import { deletePost } from '@/app/delete/action' // Ensure this path is correct
+import { deletePost } from '@/app/delete/action'
 
 type Props = {
 postId: number
