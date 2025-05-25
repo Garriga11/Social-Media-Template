@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export function Sidebar() {
     return (
-        <aside className="w-64 p-6 bg-white-800 border-black shadow-1g border-radius-2xl text-black h-screen p-4 flex flex-col">
+        <aside className="w-64 p-6 bg-gray-800 border-black shadow-lg rounded-2xl text-white h-screen flex flex-col">
             <h2 className="text-xl font-bold mb-6">Navigation</h2>
             <nav className="space-y-4">
                 <Link href="/" className="block hover:underline">
@@ -16,7 +16,7 @@ export function Sidebar() {
                 <Link href="/createPost" className="block hover:underline">
                     Create Post
                 </Link>
-                <Link href="/profile" className="block hover:underline">
+                <Link href="/user" className="block hover:underline">
                     Profile
                 </Link>
             </nav>

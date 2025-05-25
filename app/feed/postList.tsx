@@ -34,12 +34,12 @@ export function PostList() {
                             content={post.content}
                             createdAt={post.createdAt.toString()}
                             user={{
-                                ...post.user,
-                                firstName: post.user.firstName ?? undefined,
-                                lastName: post.user.lastName ?? undefined,
+                                ...post.User,
+                                firstName: post.User.name ?? undefined,
+                                lastName: undefined, // Adjusted as 'lastName' is not defined in the Post type
                             }}
                         />
-                        {user?.id === post.userId && (
+                        {user?.id === post.User.clerkId && (
                             <div className="absolute top-2 right-2">
                              
                             </div>

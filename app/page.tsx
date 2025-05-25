@@ -19,7 +19,7 @@ export default function Home() {
           className="mb-8 rounded-full shadow-xl"
         />
         <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-4 leading-tight">
-           <span className="text-gray-600">Savy</span>
+          <span className="text-gray-600">Savy</span>
         </h1>
         <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mb-8">
           A modern social media starter built with Next.js 15, Tailwind, and Clerk — powered by Vercel.
@@ -45,16 +45,15 @@ export default function Home() {
             Create A Post
           </Link>
           <Link
-            href="/user"
-            className="px-6 py-3 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600 transition"
-          >
-            Update Profile
+            href="user"
+            className="px-6 py-3 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600 transition">
+       User Profile
           </Link>
         </div>
       </section>
 
       <section className="px-4 py-12 sm:px-8 lg:px-16 bg-gray-50 border-t border-gray-200">
-       
+
       </section>
 
       <footer className="w-full bg-white border-t border-gray-200 text-center text-sm py-6 text-gray-500">

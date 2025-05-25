@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createPost } from "@/app/createPost/action"; 
+import { createPost } from "./action";
 
 export function CreatePostForm() {
     const [error, setError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export function CreatePostForm() {
         } finally {
             setIsLoading(false); // Reset loading state
         }
-    };
+    }; // <-- Ensure this closing brace is present
 
     return (
         <form onSubmit={handleSubmit} className="space-y-2">
