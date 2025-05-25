@@ -49,17 +49,19 @@ export async function POST(req: Request) {
     }
 }
 
-export async function GET() {
-    console.log("Incoming GET request to /api/posts");
 
+
+export async function GET() {
     try {
-        // Fetch all posts from the database
-        const posts = await prisma.post.findMany();
-        console.log("Posts fetched successfully:", posts);
+        const posts = await prisma.post.findMany({
+            include: {
+                author: true, 
+            },
+        });
 
         return new Response(JSON.stringify(posts), { status: 200 });
     } catch (error) {
-        console.error("Error in GET /api/posts:", error);
+        console.error("Error fetching posts:", error);
         return new Response("Internal Server Error", { status: 500 });
     }
 }
