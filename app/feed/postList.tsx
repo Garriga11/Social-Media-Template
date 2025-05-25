@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { PostCard } from './postCard'
 import { fetchPosts, Post } from './action'
-import { DeletePostButton } from '@/app/components/DeletePostButton'
+import { DeletePostButton } from '@/app/delete/deleteButton';
 
 export function PostList() {
   const { user } = useUser()
