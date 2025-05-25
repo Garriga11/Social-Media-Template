@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useUser } from '@clerk/nextjs'
-import { PostCard } from './postCard'
-import { fetchPosts, Post } from './action'
+import { useEffect, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { PostCard } from './postCard';
+import { fetchPosts, Post } from './action';
 import { DeletePostButton } from '@/app/delete/deleteButton';
 
 export function PostList() {
