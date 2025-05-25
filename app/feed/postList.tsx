@@ -75,12 +75,12 @@ export function PostList() {
                             <div className="mt-4 flex gap-4">
                                 <EditPostForm
                                     postId={post.id}
-                                    postClerkId={post.author.clerkId}
+                                    clerkId={post.author.clerkId}
                                     initialContent={post.content ?? ""}
                                 />
                                 <DeletePostButton
                                     postId={post.id}
-                                    postClerkId={post.author.clerkId}
+                                    clerkId={post.author.clerkId}
                                 />
                             </div>
                         )}
