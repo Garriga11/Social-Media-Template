@@ -9,7 +9,8 @@ export default function Home() {
     const [showSpinner, setShowSpinner] = useState(false);
     const [roomId, setroomId] = useState("");
 
-    const socket = io("http://localhost:3001");
+    const socket = io("https://savvy19.com/api/socket");
+
 
     const handleJoin = () => {
         if (userName !== "" && roomId !== "") {

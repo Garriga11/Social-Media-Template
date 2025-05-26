@@ -8,9 +8,11 @@ interface IMsgDataTypes {
     time: string;
 }
 
-const ChatPage = ({ socket, username, roomId }: any) => {
+const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
     const [currentMsg, setCurrentMsg] = useState("");
     const [chat, setChat] = useState<IMsgDataTypes[]>([]);
+
+    const fullName = `${firstName} ${lastName}`; // Combine first and last name
 
     const sendData = useCallback(
         async (e: React.FormEvent<HTMLFormElement>) => {
@@ -18,7 +20,7 @@ const ChatPage = ({ socket, username, roomId }: any) => {
             if (currentMsg !== "") {
                 const msgData: IMsgDataTypes = {
                     roomId,
-                    user: username,
+                    user: fullName, // Use full name here
                     msg: currentMsg,
                     time: new Date().toLocaleTimeString(),
                 };
@@ -26,7 +28,7 @@ const ChatPage = ({ socket, username, roomId }: any) => {
                 setCurrentMsg("");
             }
         },
-        [socket, currentMsg, username, roomId]
+        [socket, currentMsg, fullName, roomId]
     );
 
     useEffect(() => {
@@ -46,7 +48,7 @@ const ChatPage = ({ socket, username, roomId }: any) => {
             <div className="border border-gray-300 rounded-lg p-4 w-full max-w-md">
                 <div className="mb-4 text-center">
                     <p>
-                        Name: <b>{username}</b> | Room ID: <b>{roomId}</b>
+                        Name: <b>{fullName}</b> | Room ID: <b>{roomId}</b>
                     </p>
                 </div>
 
@@ -54,13 +56,13 @@ const ChatPage = ({ socket, username, roomId }: any) => {
                     {chat.map(({ roomId, user, msg, time }, key) => (
                         <div
                             key={key}
-                            className={`flex items-center ${user === username ? "justify-end" : "justify-start"
+                            className={`flex items-center ${user === fullName ? "justify-end" : "justify-start"
                                 }`}
                         >
                             <div
-                                className={`p-2 rounded-lg max-w-xs ${user === username
-                                        ? "bg-blue-500 text-white"
-                                        : "bg-gray-200 text-black"
+                                className={`p-2 rounded-lg max-w-xs ${user === fullName
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-gray-200 text-black"
                                     }`}
                             >
                                 <span className="text-sm font-bold">{user.charAt(0)}</span>
