@@ -9,6 +9,8 @@ interface IMsgDataTypes {
 }
 
 const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
+    console.log("Props in ChatPage:", { socket, firstName, lastName, roomId });
+
     const [currentMsg, setCurrentMsg] = useState("");
     const [chat, setChat] = useState<IMsgDataTypes[]>([]);
 
@@ -20,10 +22,11 @@ const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
             if (currentMsg !== "") {
                 const msgData: IMsgDataTypes = {
                     roomId,
-                    user: fullName, // Use full name here
+                    user: fullName,
                     msg: currentMsg,
                     time: new Date().toLocaleTimeString(),
                 };
+                console.log("Sending message:", msgData);
                 await socket.emit("send_msg", msgData);
                 setCurrentMsg("");
             }
@@ -33,7 +36,12 @@ const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
 
     useEffect(() => {
         const handleReceiveMsg = (data: IMsgDataTypes) => {
-            setChat((prev) => [...prev, data]);
+            console.log("Message received:", data);
+            setChat((prev) => {
+                const updatedChat = [...prev, data];
+                console.log("Chat state updated:", updatedChat);
+                return updatedChat;
+            });
         };
 
         socket.on("receive_msg", handleReceiveMsg);
@@ -42,6 +50,8 @@ const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
             socket.off("receive_msg", handleReceiveMsg);
         };
     }, [socket]);
+
+    console.log("Rendering ChatPage with chat:", chat);
 
     return (
         <div className="flex flex-col items-center p-4">

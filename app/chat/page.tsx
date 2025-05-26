@@ -1,6 +1,6 @@
 "use client";
 import { io } from "socket.io-client";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ChatPage from "@/app/chat/chatComponent";
 
 export default function Home() {
@@ -8,15 +8,27 @@ export default function Home() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [showSpinner, setShowSpinner] = useState(false);
-    const [roomId, setroomId] = useState("");
+    const [roomId, setRoomId] = useState("");
 
+    const socket = useMemo(() => io("https://savvy19.com/api/socket"), []);
 
-    const socket = io("https://savvy19.com/api/socket");
+    useEffect(() => {
+        socket.on("connect", () => {
+            console.log("Socket connected:", socket.id);
+        });
 
+        socket.on("connect_error", (err) => {
+            console.error("Socket connection error:", err);
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, [socket]);
 
     const handleJoin = () => {
-        if (firstName && lastName !== "" && roomId !== "") {
-            if (firstName !== "" && lastName !== "" && roomId !== "") {
+        if (firstName !== "" && lastName !== "" && roomId !== "") {
+            console.log("Joining room:", roomId);
             socket.emit("join_room", roomId);
             setShowSpinner(true);
 
@@ -26,9 +38,11 @@ export default function Home() {
                 setShowSpinner(false);
             }, 4000);
         } else {
-            alert("Please fill in Username and Room ID");
+            alert("Please fill in First Name, Last Name, and Room ID");
         }
     };
+
+    console.log("showChat:", showChat);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -51,20 +65,22 @@ export default function Home() {
                     <input
                         type="text"
                         placeholder="Room ID"
-                        onChange={(e) => setroomId(e.target.value)}
+                        onChange={(e) => setRoomId(e.target.value)}
                         disabled={showSpinner}
                         className="p-2 border rounded-md w-64"
                     />
                     <button
                         onClick={handleJoin}
                         className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+                        aria-live="polite"
                     >
                         {!showSpinner ? "Join" : <div className="animate-spin border-t-2 border-white rounded-full w-5 h-5"></div>}
                     </button>
                 </div>
             ) : (
-                    <ChatPage socket={socket} roomId={roomId} firstName={firstName} lastName={lastName} />
+                console.log("Rendering ChatPage"),
+                <ChatPage socket={socket} roomId={roomId} firstName={firstName} lastName={lastName} />
             )}
         </div>
     );
-}}
+}
