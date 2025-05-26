@@ -1,23 +1,48 @@
-'use server';
+"use server";
 
-import { useAuth } from '@clerk/nextjs';
-import prisma from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
+import { auth } from "@clerk/nextjs/server";
+import prisma from "@/lib/prisma";
 
 export async function createPost(content: string) {
-    const { userId } = useAuth();
-    if (!userId) throw new Error('Not authenticated');
+    // Authenticate the user
+    const { userId: clerkId } = await auth();
 
-    await prisma.post.create({
-        data: {
-            content,
-            clerkId: userId,
-            author: {
-                connect: { id: Number(userId) }, // Assuming `userId` corresponds to the `id` of the author
-            },
-        },
+    if (!clerkId) {
+        throw new Error("Unauthorized: User is not signed in.");
+    }
+
+    // Validate the content
+    if (!content || content.trim().length === 0) {
+        throw new Error("Validation error: Content cannot be empty.");
+    }
+
+    if (content.length > 500) {
+        throw new Error("Validation error: Content exceeds the maximum length of 500 characters.");
+    }
+
+    // Find the user in the database using the Clerk ID
+    const user = await prisma.user.findUnique({
+        where: { clerkId },
     });
 
-    // Revalidate the feed page to show the new post
-    revalidatePath('/feed');
+    if (!user) {
+        throw new Error("User not found: Please ensure the user exists in the database.");
+    }
+
+    // Create the post
+    try {
+        const post = await prisma.post.create({
+            data: {
+                content,
+                authorId: user.id,
+                clerkId: user.clerkId,
+            },
+        });
+
+        console.log("Post created successfully:", post);
+        return post;
+    } catch (error) {
+        console.error("Error creating post:", error);
+        throw new Error("Failed to create post.");
+    }
 }
