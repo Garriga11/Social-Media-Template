@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createPost } from "./action";
+import { createPost } from "@/app/createPost/action";
 
 export function CreatePostForm() {
     const [error, setError] = useState<string | null>(null);
@@ -17,18 +17,20 @@ export function CreatePostForm() {
             return;
         }
 
-        setIsLoading(true); // Set loading state
+        setIsLoading(true);
         try {
+            console.log("Submitting post:", content); // Debugging log
             await createPost(content);
             setError(null);
             console.log("Post created successfully!");
-            window.location.href = "/feed";
+            window.location.href = "/feed"; // Redirect to feed
         } catch (err: any) {
+            console.error("Error creating post:", err); // Debugging log
             setError(err.message || "Failed to create post.");
         } finally {
-            setIsLoading(false); // Reset loading state
+            setIsLoading(false);
         }
-    }; // <-- Ensure this closing brace is present
+    };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-2">
@@ -42,7 +44,7 @@ export function CreatePostForm() {
             <button
                 type="submit"
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                disabled={isLoading} // Disable button while loading
+                disabled={isLoading}
             >
                 {isLoading ? "Submitting..." : "Submit"}
             </button>
