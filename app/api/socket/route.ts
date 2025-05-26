@@ -1,13 +1,21 @@
 import { Server } from "socket.io";
 import { createServer } from "http";
-import { NextRequest } from "next/server";
+import jwt from "jsonwebtoken";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://savvy19.com", // Use the frontend domain, not the API route
+        origin: "https://savvy19.com",
         methods: ["GET", "POST"],
         credentials: true,
+    },
+    allowRequest: (req, callback) => {
+        const token = req.headers.authorization?.split(" ")[1]; // Extract token from "Bearer <token>"
+        if (validateToken(token)) {
+            callback(null, true);
+        } else {
+            callback("Unauthorized", false);
+        }
     },
 });
 
@@ -21,19 +29,40 @@ io.on("connection", (socket) => {
 
     socket.on("send_msg", (data) => {
         console.log("Received message:", data);
-        socket.to(data.roomId).emit("receive_msg", data);
+        io.to(data.roomId).emit("receive_msg", data); 
     });
 
     socket.on("disconnect", () => {
         console.log("A user disconnected:", socket.id);
     });
+
+    socket.on("error", (err) => {
+        console.error("Socket error:", err);
+    });
 });
 
-export async function GET(req: NextRequest) {
-    if (!httpServer.listening) {
-        httpServer.listen(process.env.PORT || 3001, () => {
-            console.log("Socket.io server is running...");
-        });
-    }
+// Start the server
+const PORT = process.env.PORT || 3001;
+httpServer.listen(PORT, () => {
+    console.log(`Socket.io server is running on port ${PORT}...`);
+});
+
+export async function GET() {
     return new Response("WebSocket server is active!", { status: 200 });
+}
+
+function validateToken(token: string | undefined): boolean {
+    if (!token) return false;
+
+    try {
+        const secretKey = process.env.JWT_SECRET; // Use the secret key from .env
+        if (!secretKey) {
+            throw new Error("JWT_SECRET is not defined in the environment variables.");
+        }
+        jwt.verify(token, secretKey); // Verify the token
+        return true; // Token is valid
+    } catch (err) {
+        console.error("Invalid token:", err);
+        return false; // Token is invalid
+    }
 }

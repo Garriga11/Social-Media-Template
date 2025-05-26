@@ -5,16 +5,18 @@ import ChatPage from "@/app/chat/chatComponent";
 
 export default function Home() {
     const [showChat, setShowChat] = useState(false);
-    const [userName, setUserName] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [showSpinner, setShowSpinner] = useState(false);
     const [roomId, setroomId] = useState("");
+
 
     const socket = io("https://savvy19.com/api/socket");
 
 
     const handleJoin = () => {
-        if (userName !== "" && roomId !== "") {
-            console.log(userName, "userName", roomId, "roomId");
+        if (firstName && lastName !== "" && roomId !== "") {
+            if (firstName !== "" && lastName !== "" && roomId !== "") {
             socket.emit("join_room", roomId);
             setShowSpinner(true);
 
@@ -34,8 +36,15 @@ export default function Home() {
                 <div className="flex flex-col items-center gap-4 border border-gray-300 p-6 rounded-lg shadow-md">
                     <input
                         type="text"
-                        placeholder="Username"
-                        onChange={(e) => setUserName(e.target.value)}
+                        placeholder="First Name"
+                        onChange={(e) => setFirstName(e.target.value)}
+                        disabled={showSpinner}
+                        className="p-2 border rounded-md w-64"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Last Name"
+                        onChange={(e) => setLastName(e.target.value)}
                         disabled={showSpinner}
                         className="p-2 border rounded-md w-64"
                     />
@@ -54,8 +63,8 @@ export default function Home() {
                     </button>
                 </div>
             ) : (
-                <ChatPage socket={socket} roomId={roomId} username={userName} />
+                    <ChatPage socket={socket} roomId={roomId} firstName={firstName} lastName={lastName} />
             )}
         </div>
     );
-}
+}}
