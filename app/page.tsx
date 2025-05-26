@@ -49,6 +49,12 @@ export default function Home() {
             className="px-6 py-3 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600 transition">
        User Profile
           </Link>
+
+          <Link
+            href="/chat"
+            className="px-6 py-3 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600 transition">
+            Start A Chat 
+          </Link>
         </div>
       </section>
 
