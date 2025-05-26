@@ -7,12 +7,12 @@ import { fetchPosts, Post } from './action';
 import { DeletePostButton } from '@/app/delete/deleteButton';
 
 export function PostList() {
-  const { user } = useUser()
-  const [posts, setPosts] = useState<Post[]>([])
+  const { user } = useUser();
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    fetchPosts().then(setPosts).catch(console.error)
-  }, [])
+    fetchPosts().then(setPosts).catch(console.error);
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -35,7 +35,7 @@ export function PostList() {
                   postId={parseInt(post.id)}
                   clerkId={post.User.clerkId}
                   onDeleted={() => {
-                    setPosts((prev) => prev.filter((p) => p.id !== post.id))
+                    setPosts((prev) => prev.filter((p) => p.id !== post.id));
                   }}
                 />
               </div>
@@ -46,5 +46,5 @@ export function PostList() {
         <p>No posts available.</p>
       )}
     </div>
-  )
+  );
 }
