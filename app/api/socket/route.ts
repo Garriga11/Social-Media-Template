@@ -1,11 +1,12 @@
 import { Server } from "socket.io";
-import { createServer } from "http";
+import { createServer } from "http"; // This is the correct import for creating the HTTP server
 import jwt from "jsonwebtoken";
+
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://savvy19.com",
+        origin: "https://savvy19.fyi",
         methods: ["GET", "POST"],
         credentials: true,
     },
