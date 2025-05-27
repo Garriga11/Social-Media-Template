@@ -51,11 +51,7 @@ io.on("connection", (socket) => {
     });
 });
 
-// Start the server
-const PORT = process.env.PORT || 3001;
-httpServer.listen(PORT, () => {
-    console.log(`Socket.io server is running on port ${PORT}...`);
-});
+
 
 export async function GET() {
     return new Response("WebSocket server is active!", { status: 200 });
