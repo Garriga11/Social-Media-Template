@@ -28,10 +28,11 @@ const RoomSelectionModal = ({ onSelectRoom }: { onSelectRoom: (roomId: string) =
 };
 
 export default function Home() {
-    const [showChat, setShowChat] = useState(false);
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [roomId, setRoomId] = useState<string | null>(null);
+    const [showChat, setShowChat] = useState(false); // Controls whether the chat page is shown
+    const [firstName, setFirstName] = useState(""); // Stores the user's first name
+    const [lastName, setLastName] = useState(""); // Stores the user's last name
+    const [roomId, setRoomId] = useState<string | null>(null); // Stores the selected room ID
+    const [showModal, setShowModal] = useState(false); // Controls modal visibility
 
     const socket = useMemo(() => io("https://savvy19.com/api/socket"), []);
 
@@ -49,15 +50,22 @@ export default function Home() {
         };
     }, [socket]);
 
-    const handleJoinRoom = (roomId: string) => {
+    // Opens the modal if the user has filled in their name
+    const handleOpenModal = () => {
         if (firstName !== "" && lastName !== "") {
-            console.log("Joining room:", roomId);
-            setRoomId(roomId);
-            socket.emit("join_room", roomId);
-            setShowChat(true);
+            setShowModal(true);
         } else {
-            alert("Please fill in First Name and Last Name before joining a room.");
+            alert("Please fill in First Name and Last Name before selecting a room.");
         }
+    };
+
+    // Joins the selected room and closes the modal
+    const handleJoinRoom = (roomId: string) => {
+        console.log("Joining room:", roomId);
+        setRoomId(roomId);
+        socket.emit("join_room", roomId);
+        setShowChat(true);
+        setShowModal(false);
     };
 
     return (
@@ -78,13 +86,13 @@ export default function Home() {
                             className="p-2 border rounded-md w-64"
                         />
                         <button
-                            onClick={() => setRoomId(null)} // Open the modal
+                            onClick={handleOpenModal}
                             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
                         >
                             Select Room
                         </button>
                     </div>
-                    {roomId === null && <RoomSelectionModal onSelectRoom={handleJoinRoom} />}
+                    {showModal && <RoomSelectionModal onSelectRoom={handleJoinRoom} />}
                 </>
             ) : (
                 <ChatPage socket={socket} roomId={roomId} firstName={firstName} lastName={lastName} />
