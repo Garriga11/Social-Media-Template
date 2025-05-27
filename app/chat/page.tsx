@@ -34,7 +34,7 @@ export default function Home() {
     const [roomId, setRoomId] = useState<string | null>(null); // Stores the selected room ID
     const [showModal, setShowModal] = useState(false); // Controls modal visibility
 
-    const socket = useMemo(() => io("https://savvy19.com/api/socket"), []);
+    const socket = useMemo(() => io("https://savvy19.fyi/api/socket"), []);
 
     useEffect(() => {
         socket.on("connect", () => {

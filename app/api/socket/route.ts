@@ -1,12 +1,30 @@
 import { Server } from "socket.io";
-import { createServer } from "http"; // This is the correct import for creating the HTTP server
+import { createServer } from "http"; // For creating the HTTP server
+import express from "express"; // Import Express
 import jwt from "jsonwebtoken";
 
+const app = express(); // Create an Express app
 
-const httpServer = createServer();
+// Middleware to parse JSON requests (if needed for your HTTP routes)
+app.use(express.json());
+
+// Example HTTP route
+app.get("/api/example", (req, res) => {
+    res.json({ message: "Hello from the REST API!" });
+});
+
+// Add more HTTP routes as needed
+app.get("/api/status", (req, res) => {
+    res.json({ status: "WebSocket server is running!" });
+});
+
+// Create the HTTP server and attach Express
+const httpServer = createServer(app);
+
+// Attach Socket.IO to the HTTP server
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://savvy19.fyi",
+        origin: "https://savvy19.fyi", // Your frontend's production URL
         methods: ["GET", "POST"],
         credentials: true,
     },
@@ -20,6 +38,7 @@ const io = new Server(httpServer, {
     },
 });
 
+// Socket.IO logic
 io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
 
@@ -30,7 +49,7 @@ io.on("connection", (socket) => {
 
     socket.on("send_msg", (data) => {
         console.log("Received message:", data);
-        io.to(data.roomId).emit("receive_msg", data); 
+        io.to(data.roomId).emit("receive_msg", data);
     });
 
     socket.on("disconnect", () => {
@@ -45,13 +64,10 @@ io.on("connection", (socket) => {
 // Start the server
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {
-    console.log(`Socket.io server is running on port ${PORT}...`);
+    console.log(`Server is running on port ${PORT}...`);
 });
 
-export async function GET() {
-    return new Response("WebSocket server is active!", { status: 200 });
-}
-
+// Token validation function
 function validateToken(token: string | undefined): boolean {
     if (!token) return false;
 
