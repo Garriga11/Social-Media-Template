@@ -32,9 +32,45 @@ export default function Home() {
     const [firstName, setFirstName] = useState(""); // Stores the user's first name
     const [lastName, setLastName] = useState(""); // Stores the user's last name
     const [roomId, setRoomId] = useState<string | null>(null); // Stores the selected room ID
+    const[inputValue, setInputValue] = useState(""); // Stores the current input value
     const [showModal, setShowModal] = useState(false); // Controls modal visibility
-
     const socket = useMemo(() => io("https://savvy19.fyi/api/socket"), []);
+    const [messages, setMessages] = useState<string[]>([]);
+
+socket.on('message', (message) => {
+    setMessages((prevMessages) => [...prevMessages, message]);
+});
+
+    const sendMessage = () => {
+        if (inputValue.trim()) {
+            socket.emit('message', inputValue);
+            setInputValue('');
+        }
+    };
+
+    socket.on('message', (message) => {
+        setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    const [activeUsers, setActiveUsers] = useState({});
+
+    interface ActiveUsers {
+        [userId: string]: boolean;
+    }
+
+    socket.on('connect', () => {
+        console.log("Socket connected:", socket.id);
+    });
+
+    <ul>
+        {Object.keys(activeUsers).map((userId) => (
+            <li key={userId}>{userId} is online</li>
+        ))}
+    </ul>
+
+    socket.on('disconnect', (userId) => {
+        setActiveUsers((prevActiveUsers) => ({ ...prevActiveUsers, [userId]: false }));
+    });
 
     useEffect(() => {
         socket.on("connect", () => {
