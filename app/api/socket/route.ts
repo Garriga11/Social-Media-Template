@@ -1,49 +1,34 @@
 import { Server } from "socket.io";
-import { createServer } from "http"; // This is the correct import for creating the HTTP server
+import { createServer } from "http";
+import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
-
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://savvy19.com",
+        origin: "https://savvy19.com", // ✅ Ensure your frontend domain is correctly set
         methods: ["GET", "POST"],
         credentials: true,
         allowedHeaders: ["Authorization", "Content-Type"],
-    },
-    allowRequest: (req, callback) => {
-        const token = req.headers.authorization?.split(" ")[1]; // Extract token from "Bearer <token>"
-        if (validateToken(token)) {
-            callback(null, true);
-        } else {
-            callback("Unauthorized", false);
-        }
+        exposedHeaders: ["Authorization", "Content-Type"],
     },
 });
-
-const headers = new Headers();
-headers.set("Access-Control-Allow-Origin", "https://savvy19.com");
-headers.set("Access-Control-Allow-Methods", "GET, POST");
-headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-headers.set("Access-Control-Allow-Credentials", "true");
-
-
 
 io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
 
     socket.on("join_room", (roomId) => {
         socket.join(roomId);
-        console.log(`User with ID ${socket.id} joined room ${roomId}`);
+        console.log(`User ${socket.id} joined room ${roomId}`);
     });
 
     socket.on("send_msg", (data) => {
         console.log("Received message:", data);
-        io.to(data.roomId).emit("receive_msg", data); 
+        io.to(data.roomId).emit("receive_msg", data);
     });
 
     socket.on("disconnect", () => {
-        console.log("A user disconnected:", socket.id);
+        console.log("User disconnected:", socket.id);
     });
 
     socket.on("error", (err) => {
@@ -52,26 +37,30 @@ io.on("connection", (socket) => {
 });
 
 
-
-export async function GET() {
-    return new Response("WebSocket server is active!", { status: 200 });
+export async function GET(req: NextRequest) {
+    return new Response("WebSocket server is active!", {
+        status: 200,
+        headers: {
+            "Access-Control-Allow-Origin": "https://savvy19.com",
+            "Access-Control-Allow-Methods": "GET, POST",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Credentials": "true",
+        },
+    });
 }
 
 function validateToken(token: string | undefined): boolean {
     if (!token) return false;
 
     try {
-        const secretKey = process.env.JWT_SECRET; // Use the secret key from .env
+        const secretKey = process.env.JWT_SECRET; 
         if (!secretKey) {
-            throw new Error("JWT_SECRET is not defined in the environment variables.");
+            throw new Error("JWT_SECRET is missing in environment variables.");
         }
-        jwt.verify(token, secretKey); // Verify the token
-        return true; // Token is valid
+        jwt.verify(token, secretKey);
+        return true;
     } catch (err) {
         console.error("Invalid token:", err);
-        return false; // Token is invalid
+        return false;
     }
-
-
-    
 }
