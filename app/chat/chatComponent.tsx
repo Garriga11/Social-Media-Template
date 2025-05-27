@@ -1,5 +1,8 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
+import { io } from "socket.io-client";
+
+
 
 interface IMsgDataTypes {
     roomId: string | number;
@@ -7,6 +10,11 @@ interface IMsgDataTypes {
     msg: string;
     time: string;
 }
+
+const socket = io("https://savvy19.fyi/api/socket", {
+    transports: ["websocket"],
+    autoConnect: true,
+});
 
 const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
     console.log("Props in ChatPage:", { socket, firstName, lastName, roomId });
