@@ -2,15 +2,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { io } from "socket.io-client";
 
-
 interface IMsgDataTypes {
     roomId: string | number;
     user: string;
     msg: string;
     time: string;
 }
-
-
 
 const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
     console.log("Props in ChatPage:", { socket, firstName, lastName, roomId });
@@ -20,42 +17,33 @@ const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
 
     const fullName = `${firstName} ${lastName}`; // Combine first and last name
 
-    const sendData = useCallback(
-        async (e: React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            if (currentMsg !== "") {
-                const msgData: IMsgDataTypes = {
-                    roomId,
-                    user: fullName,
-                    msg: currentMsg,
-                    time: new Date().toLocaleTimeString(),
-                };
-                console.log("Sending message:", msgData);
-                await socket.emit("send_msg", msgData);
-                setCurrentMsg("");
-            }
-        },
-        [socket, currentMsg, fullName, roomId]
-    );
+    const sendData = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (currentMsg.trim() !== "") {
+            const msgData: IMsgDataTypes = {
+                roomId,
+                user: fullName,
+                msg: currentMsg,
+                time: new Date().toLocaleTimeString(),
+            };
+
+            console.log("Sending message:", msgData);
+            setChat((prev) => [...prev, msgData]); // ✅ Display message instantly
+            await socket.emit("send_msg", msgData); // ✅ Broadcast to other users
+            setCurrentMsg("");
+        }
+    };
 
     useEffect(() => {
-        const handleReceiveMsg = (data: IMsgDataTypes) => {
+        socket.on("receive_msg", (data: IMsgDataTypes) => {
             console.log("Message received:", data);
-            setChat((prev) => {
-                const updatedChat = [...prev, data];
-                console.log("Chat state updated:", updatedChat);
-                return updatedChat;
-            });
-        };
-
-        socket.on("receive_msg", handleReceiveMsg);
+            setChat((prev) => [...prev, data]); // ✅ Updates chat state immediately
+        });
 
         return () => {
-            socket.off("receive_msg", handleReceiveMsg);
+            socket.off("receive_msg");
         };
     }, [socket]);
-
-    console.log("Rendering ChatPage with chat:", chat);
 
     return (
         <div className="flex flex-col items-center p-4">
@@ -67,17 +55,13 @@ const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
                 </div>
 
                 <div className="space-y-2 overflow-y-auto max-h-80">
-                    {chat.map(({ roomId, user, msg, time }, key) => (
+                    {chat.map(({ user, msg, time }, key) => (
                         <div
                             key={key}
-                            className={`flex items-center ${user === fullName ? "justify-end" : "justify-start"
-                                }`}
+                            className={`flex items-center ${user === fullName ? "justify-end" : "justify-start"}`}
                         >
                             <div
-                                className={`p-2 rounded-lg max-w-xs ${user === fullName
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-gray-200 text-black"
-                                    }`}
+                                className={`p-2 rounded-lg max-w-xs ${user === fullName ? "bg-blue-500 text-white" : "bg-gray-200 text-black"}`}
                             >
                                 <span className="text-sm font-bold">{user.charAt(0)}</span>
                                 <p className="text-sm">{msg}</p>
