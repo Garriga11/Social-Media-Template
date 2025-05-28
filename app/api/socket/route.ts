@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://savvy19.com", // ✅ Ensure your frontend domain is correctly set
+        origin: "https://savvy19.com/chat/chatComponent", // ✅ Ensure your frontend domain is correctly set
         methods: ["GET", "POST"],
         credentials: true,
         allowedHeaders: ["Authorization", "Content-Type"],
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     return new Response("WebSocket server is active!", {
         status: 200,
         headers: {
-            "Access-Control-Allow-Origin": "https://savvy19.com",
+            "Access-Control-Allow-Origin": "https://savvy19.com/chat/chatComponent",
             "Access-Control-Allow-Methods": "GET, POST",
             "Access-Control-Allow-Headers": "Content-Type, Authorization",
             "Access-Control-Allow-Credentials": "true",
