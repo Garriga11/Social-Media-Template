@@ -3,8 +3,6 @@ import { createServer } from "http";
 import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
-
-
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
@@ -27,10 +25,6 @@ io.on("connection", (socket) => {
     socket.on("send_msg", (data) => {
         console.log("Received message:", data);
         io.to(data.roomId).emit("receive_msg", data);
-        io.emit('broadcast', message);
-       });
-    
-
     });
 
     socket.on("disconnect", () => {
@@ -70,3 +64,5 @@ function validateToken(token: string | undefined): boolean {
         return false;
     }
 } 
+
+
