@@ -19,7 +19,7 @@ export default function Home() {
           className="mb-8 rounded-full shadow-xl"
         />
         <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-4 leading-tight">
-          <span className="text-gray-600">Savy</span>
+          <span className="text-gray-600">Savvy</span>
         </h1>
         <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mb-8">
           A modern social media starter built with Next.js 15, Tailwind, and Clerk — powered by Vercel.
