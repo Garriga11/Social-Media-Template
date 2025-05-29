@@ -1,91 +1,84 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
-import { io } from "socket.io-client";
+import React, { useEffect, useState } from "react";
 
 interface IMsgDataTypes {
-    roomId: string | number;
-    user: string;
-    msg: string;
-    time: string;
+  roomId: string;
+  user: string;
+  msg: string;
+  time: string;
 }
 
 const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
-    console.log("Props in ChatPage:", { socket, firstName, lastName, roomId });
+  const fullName = `${firstName} ${lastName}`;
+  const [currentMsg, setCurrentMsg] = useState("");
+  const [chat, setChat] = useState<IMsgDataTypes[]>([]);
 
-    const [currentMsg, setCurrentMsg] = useState("");
-    const [chat, setChat] = useState<IMsgDataTypes[]>([]);
+  const sendData = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentMsg.trim()) return;
 
-    const fullName = `${firstName} ${lastName}`; // Combine first and last name
-
-    const sendData = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (currentMsg.trim() !== "") {
-            const msgData: IMsgDataTypes = {
-                roomId,
-                user: fullName,
-                msg: currentMsg,
-                time: new Date().toLocaleTimeString(),
-            };
-
-            console.log("Sending message:", msgData);
-            setChat((prev) => [...prev, msgData]); // ✅ Display message instantly
-            await socket.emit("send_msg", msgData); // ✅ Broadcast to other users
-            setCurrentMsg("");
-        }
+    const msgData: IMsgDataTypes = {
+      roomId,
+      user: fullName,
+      msg: currentMsg,
+      time: new Date().toLocaleString(),
     };
 
-    useEffect(() => {
-        socket.on("receive_msg", (data: IMsgDataTypes) => {
-            console.log("Message received:", data);
-            setChat((prev) => [...prev, data]); // ✅ Updates chat state immediately
-        });
+    setChat((prev) => [...prev, msgData]); // Show message instantly
+    socket.emit("send_msg", msgData);
 
-        return () => {
-            socket.off("receive_msg");
-        };
-    }, [socket]);
+    await fetch("/api/messages", {
+      method: "POST",
+      body: JSON.stringify(msgData),
+    });
 
-    return (
-        <div className="flex flex-col items-center p-4">
-            <div className="border border-gray-300 rounded-lg p-4 w-full max-w-md">
-                <div className="mb-4 text-center">
-                    <p>
-                        Name: <b>{fullName}</b> | Room ID: <b>{roomId}</b>
-                    </p>
-                </div>
+    setCurrentMsg("");
+  };
 
-                <div className="space-y-2 overflow-y-auto max-h-80">
-                    {chat.map(({ user, msg, time }, key) => (
-                        <div
-                            key={key}
-                            className={`flex items-center ${user === fullName ? "justify-end" : "justify-start"}`}
-                        >
-                            <div
-                                className={`p-2 rounded-lg max-w-xs ${user === fullName ? "bg-blue-500 text-white" : "bg-gray-200 text-black"}`}
-                            >
-                                <span className="text-sm font-bold">{user.charAt(0)}</span>
-                                <p className="text-sm">{msg}</p>
-                                <span className="text-xs text-gray-600">{time}</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const res = await fetch(`/api/messages?roomId=${roomId}`);
+      const data = await res.json();
+      setChat(data);
+    };
 
-                <form onSubmit={sendData} className="mt-4 flex">
-                    <input
-                        type="text"
-                        value={currentMsg}
-                        placeholder="Type your message..."
-                        onChange={(e) => setCurrentMsg(e.target.value)}
-                        className="flex-grow p-2 border border-gray-300 rounded-l-md"
-                    />
-                    <button className="bg-blue-500 text-white p-2 rounded-r-md">
-                        Send
-                    </button>
-                </form>
+    fetchMessages();
+
+    socket.on("receive_msg", (data: IMsgDataTypes) => {
+      setChat((prev) => [...prev, data]);
+    });
+
+    return () => {
+      socket.off("receive_msg");
+    };
+  }, [roomId]);
+
+  return (
+    <div className="w-full max-w-md mx-auto border p-4 rounded shadow">
+      <h3 className="mb-4 text-center">
+        Chatting as <strong>{fullName}</strong> in <strong>{roomId}</strong>
+      </h3>
+      <div className="h-64 overflow-y-auto space-y-2 mb-4">
+        {chat.map(({ user, msg, time }, idx) => (
+          <div key={idx} className={`text-sm ${user === fullName ? "text-right" : "text-left"}`}>
+            <div className={`inline-block px-2 py-1 rounded ${user === fullName ? "bg-blue-500 text-white" : "bg-gray-200"}`}>
+              <p>{msg}</p>
+              <p className="text-xs">{user} @ {time}</p>
             </div>
-        </div>
-    );
+          </div>
+        ))}
+      </div>
+      <form onSubmit={sendData} className="flex gap-2">
+        <input
+          value={currentMsg}
+          onChange={(e) => setCurrentMsg(e.target.value)}
+          placeholder="Type message..."
+          className="flex-grow p-2 border rounded"
+        />
+        <button className="bg-blue-600 text-white px-3 rounded">Send</button>
+      </form>
+    </div>
+  );
 };
 
 export default ChatPage;
