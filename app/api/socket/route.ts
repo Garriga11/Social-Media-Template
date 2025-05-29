@@ -29,9 +29,7 @@ io.on("connection", (socket) => {
         io.to(data.roomId).emit("receive_msg", data);
         io.emit('broadcast', message);
        });
-     });
-     return NextResponse.json({});
-   }
+    
 
     });
 
