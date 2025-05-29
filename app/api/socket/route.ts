@@ -2,7 +2,6 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
-import { NextRequest, NextResponse } from 'next/server';
 
 
 
