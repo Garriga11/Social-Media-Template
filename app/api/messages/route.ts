@@ -1,32 +1,40 @@
-import  prisma from "@/lib/prisma"; 
-
-import { NextRequest } from "next/server";
+import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 const db = prisma;
 
 export async function GET(req: NextRequest) {
     const roomId = req.nextUrl.searchParams.get("roomId");
-    if (!roomId) return new Response("Room ID required", { status: 400 });
+    if (!roomId) {
+        return new Response("Room ID required", { status: 400 });
+    }
 
-    const messages = await db.message.findMany({
-        where: { roomId },
-      
-    });
+    try {
+        const messages = await db.message.findMany({
+            where: { roomId },
+        });
 
-    return Response.json(messages);
+        return NextResponse.json(messages);
+    } catch (error) {
+        return new Response("Error fetching messages", { status: 500 });
+    }
 }
 
 export async function POST(req: NextRequest) {
-    const body = await req.json();
-    const { user, msg, createdAt, roomId } = body;
+    try {
+        const body = await req.json();
+        const { user, msg, createdAt, roomId } = body;
 
-    if (!roomId || !msg || !user) {
-        return new Response("Missing fields", { status: 400 });
+        if (!roomId || !msg || !user) {
+            return new Response("Missing fields", { status: 400 });
+        }
+
+        const saved = await db.message.create({
+            data: { roomId, user, msg, createdAt },
+        });
+
+        return NextResponse.json(saved);
+    } catch (error) {
+        return new Response("Error saving message", { status: 500 });
     }
-
-    const saved = await db.message.create({
-        data: { roomId, user, msg },
-    });
-
-    return Response.json(saved);
 }
