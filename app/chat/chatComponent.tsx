@@ -10,9 +10,8 @@ interface IMsgDataTypes {
   time: string;
 }
 
-const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
+const ChatPage = ({ socket, roomId }: any) => {
   const { user } = useUser(); // Get the authenticated user
-  const fullName = `${firstName} ${lastName}`;
   const [currentMsg, setCurrentMsg] = useState("");
   const [chat, setChat] = useState<IMsgDataTypes[]>([]);
 
@@ -27,7 +26,7 @@ const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
 
     const msgData: IMsgDataTypes = {
       roomId,
-      user: fullName,
+      user: `${user.firstName} ${user.lastName}`, // Use Clerk's user details
       msg: currentMsg,
       time: new Date().toLocaleString(),
     };
@@ -37,7 +36,7 @@ const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
 
     try {
       // Call the server action to save the message
-      await saveMessage({ roomId, userId: user.id, msg: currentMsg }); // Use Clerk's user.id
+      await saveMessage({ roomId, userId: user.id, msg: currentMsg }); // Include userId from Clerk's user object
     } catch (error) {
       console.error("Failed to save message:", error);
     }
@@ -66,14 +65,14 @@ const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
   return (
     <div className="w-full max-w-md mx-auto border p-4 rounded shadow">
       <h3 className="mb-4 text-center">
-        Chatting as <strong>{fullName}</strong> in <strong>{roomId}</strong>
+        Chatting as <strong>{user?.firstName} {user?.lastName}</strong> in <strong>{roomId}</strong>
       </h3>
       <div className="h-64 overflow-y-auto space-y-2 mb-4">
-        {chat.map(({ user, msg, time }, idx) => (
-          <div key={idx} className={`text-sm ${user === fullName ? "text-right" : "text-left"}`}>
-            <div className={`inline-block px-2 py-1 rounded ${user === fullName ? "bg-blue-500 text-white" : "bg-gray-200"}`}>
+        {chat.map(({ user: chatUser, msg, time }, idx) => (
+          <div key={idx} className={`text-sm ${chatUser === `${user?.firstName} ${user?.lastName}` ? "text-right" : "text-left"}`}>
+            <div className={`inline-block px-2 py-1 rounded ${chatUser === `${user?.firstName} ${user?.lastName}` ? "bg-blue-500 text-white" : "bg-gray-200"}`}>
               <p>{msg}</p>
-              <p className="text-xs">{user} @ {time}</p>
+              <p className="text-xs">{`${user?.firstName} ${user?.lastName}`} @ {time}</p>
             </div>
           </div>
         ))}

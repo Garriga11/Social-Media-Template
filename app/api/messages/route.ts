@@ -1,13 +1,21 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { getAuth } from "@clerk/nextjs/server"; // Import Clerk's getAuth
 
 export async function POST(req: NextRequest) {
     try {
+        // Get the authenticated user's information
+        const { userId } = getAuth(req);
+
+        if (!userId) {
+            return new Response("Unauthorized", { status: 401 });
+        }
+
         const body = await req.json();
-        const { userId, msg, roomId } = body;
+        const { msg, roomId } = body;
 
         // Validate required fields
-        if (!roomId || !msg || !userId) {
+        if (!roomId || !msg) {
             return new Response("Missing fields", { status: 400 });
         }
 
@@ -16,7 +24,7 @@ export async function POST(req: NextRequest) {
             data: {
                 roomId,
                 msg,
-                userId: parseInt(userId, 10), // Ensure userId is a number
+                userId: parseInt(userId, 10), // Ensure userId is a number if necessary
                 createdAt: new Date(),
             },
         });
