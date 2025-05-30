@@ -1,25 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const db = prisma;
-
-export async function GET(req: NextRequest) {
-    const roomId = req.nextUrl.searchParams.get("roomId");
-    if (!roomId) {
-        return new Response("Room ID required", { status: 400 });
-    }
-
-    try {
-        const messages = await db.message.findMany({
-            where: { roomId },
-        });
-
-        return NextResponse.json(messages);
-    } catch (error) {
-        return new Response("Error fetching messages", { status: 500 });
-    }
-}
-
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
@@ -31,12 +12,12 @@ export async function POST(req: NextRequest) {
         }
 
         // Save the message to the database
-        const saved = await db.message.create({
+        const saved = await prisma.message.create({
             data: {
                 roomId,
                 msg,
-                userId, // Use userId to link the message to a user
-                createdAt: new Date(), // Ensure createdAt is set
+                userId,
+                createdAt: new Date(),
             },
         });
 

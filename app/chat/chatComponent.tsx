@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs"; // Import Clerk's useUser hook
 import { saveMessage } from "@/app/chat/action";
 
 interface IMsgDataTypes {
@@ -9,7 +10,8 @@ interface IMsgDataTypes {
   time: string;
 }
 
-const ChatPage = ({ socket, firstName, lastName, roomId, userId }: any) => {
+const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
+  const { user } = useUser(); // Get the authenticated user
   const fullName = `${firstName} ${lastName}`;
   const [currentMsg, setCurrentMsg] = useState("");
   const [chat, setChat] = useState<IMsgDataTypes[]>([]);
@@ -17,6 +19,11 @@ const ChatPage = ({ socket, firstName, lastName, roomId, userId }: any) => {
   const sendData = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentMsg.trim()) return;
+
+    if (!user) {
+      console.error("User is not authenticated");
+      return;
+    }
 
     const msgData: IMsgDataTypes = {
       roomId,
@@ -30,7 +37,7 @@ const ChatPage = ({ socket, firstName, lastName, roomId, userId }: any) => {
 
     try {
       // Call the server action to save the message
-      await saveMessage({ roomId, userId, msg: currentMsg });
+      await saveMessage({ roomId, userId: parseInt(user.id, 10), msg: currentMsg }); // Convert user.id to a number
     } catch (error) {
       console.error("Failed to save message:", error);
     }
