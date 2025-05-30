@@ -37,7 +37,7 @@ const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
 
     try {
       // Call the server action to save the message
-      await saveMessage({ roomId, userId: parseInt(user.id, 10), msg: currentMsg }); // Convert user.id to a number
+      await saveMessage({ roomId, userId: user.id, msg: currentMsg }); // Use Clerk's user.id
     } catch (error) {
       console.error("Failed to save message:", error);
     }
