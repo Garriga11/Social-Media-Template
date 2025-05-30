@@ -1,4 +1,5 @@
 import  prisma from "@/lib/prisma"; 
+import { createDecipheriv } from "crypto";
 import { NextRequest } from "next/server";
 
 const db = prisma;
@@ -9,7 +10,7 @@ export async function GET(req: NextRequest) {
 
     const messages = await db.message.findMany({
         where: { roomId },
-        orderBy: { time: "asc" },
+        orderBy: { createAt: "asc" },
     });
 
     return Response.json(messages);
@@ -17,14 +18,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
-    const { user, msg, time, roomId } = body;
+    const { user, msg, createdAt, roomId } = body;
 
     if (!roomId || !msg || !user) {
         return new Response("Missing fields", { status: 400 });
     }
 
     const saved = await db.message.create({
-        data: { roomId, user, msg, time },
+        data: { roomId, user, msg, createdAt },
     });
 
     return Response.json(saved);
