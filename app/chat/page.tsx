@@ -1,94 +1,95 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs"; // Import Clerk's useUser hook
-import { saveMessage } from "@/app/chat/action";
+import { io } from "socket.io-client";
+import { useState, useEffect, useMemo } from "react";
+import ChatPage from "@/app/chat/chatComponent";
 
-interface IMsgDataTypes {
-  roomId: string;
-  user: string;
-  msg: string;
-  time: string;
-}
-
-const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
-  const { user } = useUser(); // Get the authenticated user
-  const fullName = `${firstName} ${lastName}`;
-  const [currentMsg, setCurrentMsg] = useState("");
-  const [chat, setChat] = useState<IMsgDataTypes[]>([]);
-
-  const sendData = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!currentMsg.trim()) return;
-
-    if (!user) {
-      console.error("User is not authenticated");
-      return;
-    }
-
-    const msgData: IMsgDataTypes = {
-      roomId,
-      user: fullName,
-      msg: currentMsg,
-      time: new Date().toLocaleString(),
-    };
-
-    setChat((prev) => [...prev, msgData]); // Show message instantly
-    socket.emit("send_msg", msgData);
-
-    try {
-      // Call the server action to save the message
-      await saveMessage({ roomId, userId: user.id, msg: currentMsg }); // Use Clerk's user.id
-    } catch (error) {
-      console.error("Failed to save message:", error);
-    }
-
-    setCurrentMsg("");
-  };
-
-  useEffect(() => {
-    const fetchMessages = async () => {
-      const res = await fetch(`/api/messages?roomId=${roomId}`);
-      const data = await res.json();
-      setChat(data);
-    };
-
-    fetchMessages();
-
-    socket.on("receive_msg", (data: IMsgDataTypes) => {
-      setChat((prev) => [...prev, data]);
-    });
-
-    return () => {
-      socket.off("receive_msg");
-    };
-  }, [roomId]);
+// Room selection modal
+const RoomSelectionModal = ({ onSelectRoom }: { onSelectRoom: (roomId: string) => void }) => {
+  const rooms = ["Room 1", "Room 2", "Room 3"];
 
   return (
-    <div className="w-full max-w-md mx-auto border p-4 rounded shadow">
-      <h3 className="mb-4 text-center">
-        Chatting as <strong>{fullName}</strong> in <strong>{roomId}</strong>
-      </h3>
-      <div className="h-64 overflow-y-auto space-y-2 mb-4">
-        {chat.map(({ user, msg, time }, idx) => (
-          <div key={idx} className={`text-sm ${user === fullName ? "text-right" : "text-left"}`}>
-            <div className={`inline-block px-2 py-1 rounded ${user === fullName ? "bg-blue-500 text-white" : "bg-gray-200"}`}>
-              <p>{msg}</p>
-              <p className="text-xs">{user} @ {time}</p>
-            </div>
-          </div>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <h2 className="text-lg font-bold mb-4">Select a Room</h2>
+        {rooms.map((room) => (
+          <button
+            key={room}
+            onClick={() => onSelectRoom(room)}
+            className="block w-full px-4 py-2 mb-2 bg-blue-500 text-white rounded-md"
+          >
+            {room}
+          </button>
         ))}
       </div>
-      <form onSubmit={sendData} className="flex gap-2">
-        <input
-          value={currentMsg}
-          onChange={(e) => setCurrentMsg(e.target.value)}
-          placeholder="Type message..."
-          className="flex-grow p-2 border rounded"
-        />
-        <button className="bg-blue-600 text-white px-3 rounded">Send</button>
-      </form>
     </div>
   );
 };
 
-export default ChatPage;
+export default function ChatHome() {
+  const [showChat, setShowChat] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const socket = useMemo(() => io("https://savvy19.fyi/api/socket"), []);
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Socket connected:", socket.id);
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Connection error:", err);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
+
+  const handleOpenModal = () => {
+    if (!firstName || !lastName) {
+      alert("Please enter your name first");
+      return;
+    }
+    setShowModal(true);
+  };
+
+  const handleJoinRoom = (roomId: string) => {
+    setRoomId(roomId);
+    socket.emit("join_room", roomId);
+    setShowModal(false);
+    setShowChat(true);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      {!showChat ? (
+        <>
+          <input
+            type="text"
+            placeholder="First Name"
+            onChange={(e) => setFirstName(e.target.value)}
+            className="p-2 border rounded mb-2"
+          />
+          <input
+            type="text"
+            placeholder="Last Name"
+            onChange={(e) => setLastName(e.target.value)}
+            className="p-2 border rounded mb-4"
+          />
+          <button
+            onClick={handleOpenModal}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            Join Chat Room
+          </button>
+          {showModal && <RoomSelectionModal onSelectRoom={handleJoinRoom} />}
+        </>
+      ) : (
+        <ChatPage socket={socket} firstName={firstName} lastName={lastName} roomId={roomId} />
+      )}
+    </div>
+  );
+}

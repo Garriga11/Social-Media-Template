@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createPost } from "./action";
+import { createPost } from "@/app/createPost/action"; 
 
 export function CreatePostForm() {
     const [error, setError] = useState<string | null>(null);
