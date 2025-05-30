@@ -6,23 +6,42 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
-  id          Int      @id @default(autoincrement())
-  clerkId     String   @unique 
-  email       String   
-  firstName   String   
-  lastName    String  
+  id           Int      @id @default(autoincrement())
+  clerkId      String   @unique
+  email        String
+  firstName    String
+  lastName     String
   profileImage String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  Post        Post[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  posts    Post[]
+  messages Message[] 
 }
+
 model Post {
-  content   String?
-  createdAt DateTime @default(now())
-  authorId  Int
-  clerkId   String
-  published Boolean  @default(false)
   id        Int      @id @default(autoincrement())
-  author    User     @relation(fields: [authorId], references: [id])
+  content   String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  authorId Int
+  clerkId  String
+  author   User   @relation(fields: [authorId], references: [id])
+}
+
+/// ← NEW MODEL: Chat messages
+model Message {
+  id        Int      @id @default(autoincrement())
+  roomId    String
+  content   String
+  createdAt DateTime @default(now())
+
+  senderId Int
+  sender   User @relation(fields: [senderId], references: [id])
+
+  @@index([roomId])
+  @@index([senderId])
 }
