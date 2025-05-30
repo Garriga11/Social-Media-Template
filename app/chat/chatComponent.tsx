@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { saveMessage } from "@/app/chat/action";
 
 interface IMsgDataTypes {
   roomId: string;
@@ -8,7 +9,7 @@ interface IMsgDataTypes {
   time: string;
 }
 
-const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
+const ChatPage = ({ socket, firstName, lastName, roomId, userId }: any) => {
   const fullName = `${firstName} ${lastName}`;
   const [currentMsg, setCurrentMsg] = useState("");
   const [chat, setChat] = useState<IMsgDataTypes[]>([]);
@@ -27,10 +28,12 @@ const ChatPage = ({ socket, firstName, lastName, roomId }: any) => {
     setChat((prev) => [...prev, msgData]); // Show message instantly
     socket.emit("send_msg", msgData);
 
-    await fetch("/api/messages", {
-      method: "POST",
-      body: JSON.stringify(msgData),
-    });
+    try {
+      // Call the server action to save the message
+      await saveMessage({ roomId, userId, msg: currentMsg });
+    } catch (error) {
+      console.error("Failed to save message:", error);
+    }
 
     setCurrentMsg("");
   };
