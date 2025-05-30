@@ -1,5 +1,5 @@
 import  prisma from "@/lib/prisma"; 
-import { createDecipheriv } from "crypto";
+
 import { NextRequest } from "next/server";
 
 const db = prisma;
@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 
     const messages = await db.message.findMany({
         where: { roomId },
-        orderBy: { createAt: "asc" },
+      
     });
 
     return Response.json(messages);
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     const saved = await db.message.create({
-        data: { roomId, user, msg, createdAt },
+        data: { roomId, user, msg },
     });
 
     return Response.json(saved);
