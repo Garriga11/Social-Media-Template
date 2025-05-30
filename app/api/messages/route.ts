@@ -23,18 +23,26 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { user, msg, createdAt, roomId } = body;
+        const { userId, msg, roomId } = body;
 
-        if (!roomId || !msg || !user) {
+        // Validate required fields
+        if (!roomId || !msg || !userId) {
             return new Response("Missing fields", { status: 400 });
         }
 
+        // Save the message to the database
         const saved = await db.message.create({
-            data: { roomId, user, msg, createdAt },
+            data: {
+                roomId,
+                msg,
+                userId, // Use userId to link the message to a user
+                createdAt: new Date(), // Ensure createdAt is set
+            },
         });
 
         return NextResponse.json(saved);
     } catch (error) {
+        console.error("Error saving message:", error);
         return new Response("Error saving message", { status: 500 });
     }
 }
