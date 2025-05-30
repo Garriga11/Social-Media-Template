@@ -12,16 +12,16 @@ export async function POST(req: NextRequest) {
         }
 
         // Save the message to the database
-        const saved = await prisma.message.create({
+        const savedMessage = await prisma.message.create({
             data: {
                 roomId,
                 msg,
-                userId,
+                userId: parseInt(userId, 10), // Ensure userId is a number
                 createdAt: new Date(),
             },
         });
 
-        return NextResponse.json(saved);
+        return NextResponse.json(savedMessage);
     } catch (error) {
         console.error("Error saving message:", error);
         return new Response("Error saving message", { status: 500 });
