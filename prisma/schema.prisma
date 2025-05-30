@@ -18,7 +18,7 @@ model User {
   updatedAt    DateTime @updatedAt
 
   posts    Post[]
-  messages Message[] 
+  messages Message[] // Correctly relates to the Message model
 }
 
 model Post {
@@ -32,16 +32,12 @@ model Post {
   author   User   @relation(fields: [authorId], references: [id])
 }
 
-/// ← NEW MODEL: Chat messages
 model Message {
   id        Int      @id @default(autoincrement())
+  msg       String
   roomId    String
-  content   String
   createdAt DateTime @default(now())
 
-  senderId Int
-  sender   User @relation(fields: [senderId], references: [id])
-
-  @@index([roomId])
-  @@index([senderId])
+  userId Int
+  user   User @relation(fields: [userId], references: [id]) // Correctly relates to the User model
 }

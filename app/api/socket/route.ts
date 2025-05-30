@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://savvy19.com/chat/chatComponent", // ✅ Ensure your frontend domain is correctly set
+        origin: "https://savvy19.com/chat/chatComponent",
         methods: ["GET", "POST"],
         credentials: true,
         allowedHeaders: ["Authorization", "Content-Type"],
