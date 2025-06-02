@@ -53,11 +53,3 @@ io.on('connection', (socket) => {
     });
 });
 
-export async function startSocketServer(req: NextRequest) {
-    if (!httpServer.listening) {
-        httpServer.listen(3001, () => {
-            console.log('Socket.io server is running on port 3001');
-        });
-    }
-    return new Response('WebSocket server is running', { status: 200 });
-}
